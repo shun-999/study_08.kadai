@@ -4,7 +4,10 @@ import time
 import pandas as pd
 import threading
 
+
 # Chromeを起動する関数
+
+
 def set_driver(driver_path, headless_flg):
     # Chromeドライバーの読み込み
     options = ChromeOptions()
@@ -26,63 +29,37 @@ def set_driver(driver_path, headless_flg):
 
 # main処理
 
-
 def main():
-    search_keyword = "高収入"
     # driverを起動
     if os.name == 'nt': #Windows
         driver = set_driver("chromedriver.exe", False)
     elif os.name == 'posix': #Mac
         driver = set_driver("chromedriver", False)
-    # Webサイトを開く
-    driver.get("https://tenshoku.mynavi.jp/")
-    time.sleep(5)
  
-    try:
-        # ポップアップを閉じる
-        driver.execute_script('document.querySelector(".karte-close").click()')
-        time.sleep(5)
-        # ポップアップを閉じる
-        driver.execute_script('document.querySelector(".karte-close").click()')
-    except:
-        pass
-    
-    # 検索窓に入力
-    driver.find_element_by_class_name(
-        "topSearch__text").send_keys(search_keyword)
-    # 検索ボタンクリック
-    driver.find_element_by_class_name("topSearch__button").click()
 
-    # ページ終了まで繰り返し取得
-    exp_name_list = []
-    i = 1
-    while True:
+    # 1ページ分繰り返し
+    def one_page(i):
+        # Webサイトを開く
+        driver.get("https://tenshoku.mynavi.jp/list/kw高収入/pg{}/".format(i))
+        time.sleep(5)
+        try:
+            # ポップアップを閉じる
+            driver.execute_script('document.querySelector(".karte-close").click()')
+            time.sleep(5)
+            # ポップアップを閉じる
+            driver.execute_script('document.querySelector(".karte-close").click()')
+        except:
+            pass
+    
         # 検索結果の一番上の会社名を取得
         name_list = driver.find_elements_by_class_name("cassetteRecruit__name")
+        for name in name_list:
+            print(name.text)
 
-        # 1ページ分繰り返し
-        def one_page():
-            print(f'{i}番目start')
-            print(len(name_list))
-            for name in name_list:
-                exp_name_list.append(name.text)
-                print(name.text)
-            print(f'{i}番目end')
-        
-        t = threading.Thread(target=one_page)
-        t.setDaemon(True)
+    
+    for i in range(1,6):
+        t = threading.Thread(target=one_page, args=(i,))
         t.start()
-        t.join()
-        
-        # 次のページボタンがあればクリックなければ終了
-        next_page=driver.find_elements_by_class_name("iconFont--arrowLeft")
-        if len(next_page)>=1:
-            next_page_link=next_page[0].get_attribute("href")
-            driver.get(next_page_link)
-            i += 1
-        else:
-            print("最終ページです。終了します。")
-            break
     
         
 
