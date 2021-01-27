@@ -38,10 +38,8 @@ def main():
  
 
     # 1ページ分繰り返し
-    def one_page(i):
-        # Webサイトを開く
-        driver.get("https://tenshoku.mynavi.jp/list/kw高収入/pg{}/".format(i))
-        time.sleep(5)
+    def one_page():
+
         try:
             # ポップアップを閉じる
             driver.execute_script('document.querySelector(".karte-close").click()')
@@ -56,10 +54,14 @@ def main():
         for name in name_list:
             print(name.text)
 
+
     
     for i in range(1,6):
-        t = threading.Thread(target=one_page, args=(i,))
+        t = threading.Thread(target=one_page)
         t.start()
+        # Webサイトを開く
+        driver.get("https://tenshoku.mynavi.jp/list/kw高収入/pg{}/".format(i))
+        time.sleep(5)
     
         
 
