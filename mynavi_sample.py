@@ -3,6 +3,7 @@ from selenium.webdriver import Chrome, ChromeOptions
 import time
 import pandas as pd
 import threading
+import time
 
 
 # Chromeを起動する関数
@@ -32,7 +33,7 @@ def set_driver(driver_path, headless_flg):
 def main():
 
     # 1ページ分繰り返し
-    def one_page(i):
+    def one_page(page):
         # driverを起動
         if os.name == 'nt': #Windows
             driver = set_driver("chromedriver.exe", False)
@@ -40,7 +41,7 @@ def main():
             driver = set_driver("chromedriver", False)
  
         # Webサイトを開く
-        driver.get("https://tenshoku.mynavi.jp/list/kw高収入/pg{}/".format(i))
+        driver.get("https://tenshoku.mynavi.jp/list/kw高収入/pg{}/".format(page))
         time.sleep(5)
 
         try:
@@ -57,11 +58,17 @@ def main():
         for name in name_list:
             print(name.text)
 
-
-    
-    for i in range(1,6):
-        t = threading.Thread(target=one_page, args=(i,))
+    start = time.time()
+    num = input("ページ数を入力してください>>")
+    for page in range(int(num)):
+        page += 1
+        t = threading.Thread(target=one_page, args=(page,))
         t.start()
+        t.join()
+    elapsed_time = time.time() - start
+    print(elapsed_time)
+
+
 
         
     
