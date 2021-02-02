@@ -30,15 +30,18 @@ def set_driver(driver_path, headless_flg):
 # main処理
 
 def main():
-    # driverを起動
-    if os.name == 'nt': #Windows
-        driver = set_driver("chromedriver.exe", False)
-    elif os.name == 'posix': #Mac
-        driver = set_driver("chromedriver", False)
- 
 
     # 1ページ分繰り返し
-    def one_page():
+    def one_page(i):
+        # driverを起動
+        if os.name == 'nt': #Windows
+            driver = set_driver("chromedriver.exe", False)
+        elif os.name == 'posix': #Mac
+            driver = set_driver("chromedriver", False)
+ 
+        # Webサイトを開く
+        driver.get("https://tenshoku.mynavi.jp/list/kw高収入/pg{}/".format(i))
+        time.sleep(5)
 
         try:
             # ポップアップを閉じる
@@ -57,11 +60,10 @@ def main():
 
     
     for i in range(1,6):
-        t = threading.Thread(target=one_page)
+        t = threading.Thread(target=one_page, args=(i,))
         t.start()
-        # Webサイトを開く
-        driver.get("https://tenshoku.mynavi.jp/list/kw高収入/pg{}/".format(i))
-        time.sleep(5)
+
+        
     
         
 
