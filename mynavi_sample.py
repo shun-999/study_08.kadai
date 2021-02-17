@@ -61,12 +61,18 @@ def main():
     start = time.time()
     num = input("ページ数を入力してください>>")
     for page in range(int(num)):
+        threads = []
         page += 1
         t = threading.Thread(target=one_page, args=(page,))
         t.start()
-        t.join()
-    elapsed_time = time.time() - start
-    print(elapsed_time)
+        threads.append(t)
+
+    for thread in threads:
+        thread.join()
+        if page == 3:
+            elapsed_time = time.time() - start
+            print(elapsed_time)
+
 
 
 
